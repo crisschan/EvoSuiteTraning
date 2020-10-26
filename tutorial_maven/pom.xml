@@ -1,0 +1,165 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.evosuite.tutorial</groupId>
+  <artifactId>Tutorial_Maven</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <name>Tutorial_Maven</name>
+  <url>http://maven.apache.org</url>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <evosuiteVersion>1.0.6</evosuiteVersion>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+  </properties>
+
+  <dependencies>
+    <!--引入Junit4的依赖-->
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <version>4.12</version>
+      <scope>test</scope>
+    </dependency>
+    <!--引入evosuite依赖-->
+
+    <dependency>
+      <groupId>org.evosuite</groupId>
+      <artifactId>evosuite-standalone-runtime</artifactId>
+      <version>${evosuiteVersion}</version>
+      <scope>test</scope>
+    </dependency>
+    <!--引入junit的执行插件依赖-->
+
+    <dependency>
+      <groupId>org.apache.maven.surefire</groupId>
+      <artifactId>surefire-junit4</artifactId>
+      <version>2.19</version>
+    </dependency>
+    <!--引入报告生成依赖-->
+
+    <dependency>
+      <groupId>org.apache.maven.plugins</groupId>
+      <artifactId>maven-surefire-report-plugin</artifactId>
+      <version>3.0.0-M3</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <!--引入evosuite生成单元测试用例插件-->
+
+      <plugin>
+        <groupId>org.evosuite.plugins</groupId>
+        <artifactId>evosuite-maven-plugin</artifactId>
+        <version>1.0.6</version>
+        <executions><execution>
+          <goals> <goal> prepare </goal> </goals>
+          <phase> process-test-classes </phase>
+        </execution></executions>
+      </plugin>
+      <!--引入cobertura代码覆盖插件-->
+
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>cobertura-maven-plugin</artifactId>
+        <version>2.7</version>
+        <configuration>
+          <instrumentation>
+            <ignores>
+              <ignore>com.example.boringcode.*</ignore>
+            </ignores>
+            <excludes>
+              <exclude>com/example/dullcode/**/*.class</exclude>
+              <exclude>com/example/**/*Test.class</exclude>
+            </excludes>
+          </instrumentation>
+          <check/>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>clean</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- mvn test生成xml txt测试报告（命令行不带surefire-report:report时） -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <version>2.19</version>
+        <configuration>
+          <skipTests>false</skipTests>
+          <testFailureIgnore>true</testFailureIgnore> <!-- //////////// -->
+
+          <includes>
+            <include>**/*Test.java</include>    <!-- //////////// -->
+          </includes>
+          <excludes>
+            <!-- -->
+          </excludes>
+        </configuration>
+      </plugin>
+
+      <!-- 用mvn ant生成格式更友好的report -->
+      <plugin>
+        <groupId>org.jvnet.maven-antrun-extended-plugin</groupId>
+        <artifactId>maven-antrun-extended-plugin</artifactId>   <!-- //////////// -->
+        <version>1.43</version>
+        <executions>
+          <execution>
+            <id>test-reports</id>
+            <phase>test</phase> <!-- //////////// -->
+            <configuration>
+              <tasks>
+                <junitreport todir="${basedir}/target/surefire-reports">
+                  <fileset dir="${basedir}/target/surefire-reports">
+                    <include name="**/*.xml" />
+                  </fileset>
+                  <report format="frames" todir="${basedir}/target/surefire-reports" /> <!-- //////////// -->
+                </junitreport>
+              </tasks>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant-junit</artifactId>
+            <version>1.8.0</version>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.ant</groupId>
+            <artifactId>ant-trax</artifactId>
+            <version>1.8.0</version>
+          </dependency>
+        </dependencies>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-report-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+  <!-- 代码覆盖报告 -->
+
+
+  <reporting>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>cobertura-maven-plugin</artifactId>
+        <version>2.7</version>
+      </plugin>
+    </plugins>
+  </reporting>
+
+</project>
